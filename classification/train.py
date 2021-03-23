@@ -10,9 +10,10 @@ import keras
 import tensorflow as tf
 
 from keras.applications import mobilenetv2
+from keras.applications import mobilenet
 from keras.applications import resnet50
 
-sys.path.insert(0, '/data/Projects/pylibs_hb')
+# sys.path.insert(0, '../../pylibs_hb')
 from utils_hb import makedirs
 from utils_hb import get_session
 
@@ -124,6 +125,8 @@ def create_model(weights, classes=1000, input_shape=(224, 224, 3), pooling='avg'
         base = keras.applications.DenseNet121(include_top=False, weights=args.weights, input_shape=input_shape)
     elif args.backbone == "MobileNetV2":
         base = keras.applications.MobileNetV2(include_top=False, weights=args.weights, input_shape=input_shape, alpha=args.mobilenet_alpha)
+    elif args.backbone == "MobileNet":
+        base = keras.applications.MobileNet(include_top=False, weights=args.weights, input_shape=input_shape, alpha=args.mobilenet_alpha)
     else:
         print('Unsupported backbone network: ' + args.backbone)
         return None
@@ -157,7 +160,7 @@ def main(args=None):
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu    
     keras.backend.tensorflow_backend.set_session(get_session())
 
-    if args.backbone == 'MobileNetV2':
+    if args.backbone == 'MobileNetV2' or args.backbone == 'MobileNet':
         filename_prefix = '{backbone}_{alpha}_{image_height}x{image_width}_{fully_connected_size}_{dataset_type}'.format(backbone=args.backbone, 
                             alpha=args.mobilenet_alpha, 
                             image_height=args.image_height,
@@ -173,6 +176,8 @@ def main(args=None):
 
     if args.backbone == 'MobileNetV2':
         preprocessing_function = mobilenetv2.preprocess_input
+    elif args.backbone == 'MobileNet':
+        preprocessing_function = mobilenet.preprocess_input
     elif args.backbone == 'ResNet50':
         preprocessing_function = resnet50.preprocess_input
 
